@@ -1,0 +1,20 @@
+trigger:
+- main
+pool:
+ name: dhurander
+stages:
+  - stage: 
+    jobs:
+      - job: 
+        steps:
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'docker-rg'
+            command: 'login'
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'docker-rg'
+            repository: 'telemetry'
+            command: 'buildAndPush'
+            Dockerfile: '**/Dockerfile'
+            buildContext: 'axion-telemetry-query-service'
