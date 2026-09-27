@@ -14,7 +14,7 @@ stages:
         - task: Docker@2
           inputs:
             containerRegistry: 'docker-rg'
-            repository: 'telemetry'
+            repository: 'ankitlodhi11.axionpipeline'
             command: 'buildAndPush'
             Dockerfile: '**/Dockerfile'
             buildContext: 'axion-telemetry-query-service'
