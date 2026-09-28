@@ -22,21 +22,21 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'telemetry'
+        repository: 'grugram.azurecr.io/telemetry'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         buildContext: 'axion-telemetry-query-service'
     - task: Docker@2
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'simulator'
+        repository: 'grugram.azurecr.io/simulator'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         buildContext: 'axion-data-simulator'
     - task: Docker@2
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'axion-ui'
+        repository: 'grugram.azurecr.io/axion-ui'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
         buildContext: 'axion-ui'
