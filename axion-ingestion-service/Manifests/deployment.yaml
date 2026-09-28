@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: ingestioncontainer
-          image: grugram.azurecr.io/ingestion:IMAGE_TAG
+          image: grugram.azurecr.io/ingestion:latest
           ports:
             - containerPort: 8000
           
