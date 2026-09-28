@@ -1,0 +1,15 @@
+trigger:
+- main
+pool: 
+  name: dhurander
+stages:
+  - stage: 
+    jobs:
+      - job: 
+        steps:
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'docker-rg'
+            repository: 'ankitlodhi11/axionpipeline'
+            command: 'buildAndPush'
+            Dockerfile: '**/Dockerfile'
