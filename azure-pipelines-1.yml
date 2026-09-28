@@ -9,6 +9,24 @@ stages:
   jobs:
   - job: BuildAndPush
     steps:
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          - powershell: |
+              Write-Host "====================================="
+              Write-Host "Build Sources Directory:"
+              Write-Host "$(Build.SourcesDirectory)"
+              
+              Write-Host "====================================="
+              Write-Host "Root folders:"
+              Get-ChildItem "$(Build.SourcesDirectory)"
+              
+              Write-Host "====================================="
+              Write-Host "Searching Dockerfiles:"
+              Get-ChildItem "$(Build.SourcesDirectory)" -Recurse -Filter Dockerfile |
+                  Select-Object FullName
+            displayName: 'Check Dockerfile Path'
     - task: Docker@2
       inputs:
         containerRegistry: 'docker-rg'
