@@ -12,34 +12,42 @@ stages:
 
     steps:
 
-    # Check Dockerfile location
+    - checkout: self
+      submodules: recursive
+
     - task: PowerShell@2
       displayName: 'Check Dockerfile Path'
       inputs:
         targetType: 'inline'
         script: |
-          Write-Host "====================================="
-          Write-Host "Build Sources Directory:"
-          Write-Host "$(Build.SourcesDirectory)"
+          $path = "$(Build.SourcesDirectory)\axion-ingestion-service"
 
           Write-Host "====================================="
-          Write-Host "Root folders:"
-          Get-ChildItem "$(Build.SourcesDirectory)"
+          Write-Host "Ingestion Service Folder:"
+          Write-Host $path
 
           Write-Host "====================================="
-          Write-Host "Searching Dockerfiles:"
+          Get-ChildItem $path -Force
 
-          Get-ChildItem "$(Build.SourcesDirectory)" -Recurse -Filter Dockerfile |
-            Select-Object FullName
+          Write-Host "====================================="
+          Write-Host "Dockerfile check:"
 
-    # Login to Azure Container Registry
+          if (Test-Path "$path\Dockerfile") {
+              Write-Host "Dockerfile FOUND"
+              Get-Item "$path\Dockerfile"
+          }
+          else {
+              Write-Host "Dockerfile NOT FOUND"
+              Get-ChildItem $path -Recurse -Force
+              exit 1
+          }
+
     - task: Docker@2
       displayName: 'Docker Login'
       inputs:
         containerRegistry: 'docker-rg'
         command: 'login'
 
-    # Build and Push Image
     - task: Docker@2
       displayName: 'Build and Push'
       inputs:
