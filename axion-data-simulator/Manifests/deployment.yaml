@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: simulatorcontainer
-          image: grugram.azurecr.io/simulator:IMAGE_TAG
+          image: grugram.azurecr.io/simulator:latest
           env:
             - name: API_URL
               value: "http://azioningestion-service:8000/api/v1/telemetry/ingest"
