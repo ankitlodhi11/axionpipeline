@@ -19,3 +19,24 @@ stages:
         Dockerfile: '$(Build.SourcesDirectory)/axion-ingestion-service/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/axion-ingestion-service'
         tags: '$(Build.BuildId)'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'docker-rg'
+        repository: 'telemetry'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        buildContext: 'axion-telemetry-query-service'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'docker-rg'
+        repository: 'simulator'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        buildContext: 'axion-data-simulator'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'docker-rg'
+        repository: 'axion-ui'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
+        buildContext: 'axion-ui'
