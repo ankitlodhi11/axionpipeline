@@ -1,0 +1,21 @@
+trigger:
+- main
+
+pool:
+  name: dhurander
+
+stages:
+- stage: DockerBuild
+  jobs:
+  - job: BuildAndPush
+    steps:
+
+    - task: Docker@2
+      displayName: Build and Push
+      inputs:
+        containerRegistry: 'docker-rg'
+        repository: 'grugram.azurecr.io/ingestion'
+        command: 'buildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/axion-ingestion-service/Dockerfile'
+        buildContext: '$(Build.SourcesDirectory)/axion-ingestion-service'
+        tags: '$(Build.BuildId)'
