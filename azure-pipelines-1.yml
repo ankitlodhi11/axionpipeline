@@ -4,39 +4,163 @@ trigger:
 pool:
   name: dhurander
 
+variables:
+  IMAGE_TAG: '$(Build.BuildId)'
+
 stages:
+
+# =====================================================
+# STAGE 1 - BUILD & PUSH ALL DOCKER IMAGES TO ACR
+# =====================================================
+
 - stage: DockerBuild
+  displayName: Build and Push Images
+
   jobs:
   - job: BuildAndPush
+    displayName: Build and Push Docker Images
+
     steps:
 
+    # =================================================
+    # INGESTION
+    # =================================================
+
     - task: Docker@2
-      displayName: Build and Push
+      displayName: Build and Push Ingestion
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'grugram.azurecr.io/ingestion'
+        repository: 'ingestion'
         command: 'buildAndPush'
         Dockerfile: '$(Build.SourcesDirectory)/axion-ingestion-service/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/axion-ingestion-service'
-        tags: '$(Build.BuildId)'
+        tags: |
+          $(IMAGE_TAG)
+
+
+    # =================================================
+    # TELEMETRY
+    # =================================================
+
     - task: Docker@2
+      displayName: Build and Push Telemetry
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'grugram.azurecr.io/telemetry'
+        repository: 'telemetry'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        buildContext: 'axion-telemetry-query-service'
+        Dockerfile: '$(Build.SourcesDirectory)/axion-telemetry-query-service/Dockerfile'
+        buildContext: '$(Build.SourcesDirectory)/axion-telemetry-query-service'
+        tags: |
+          $(IMAGE_TAG)
+
+
+    # =================================================
+    # SIMULATOR
+    # =================================================
+
     - task: Docker@2
+      displayName: Build and Push Simulator
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'grugram.azurecr.io/simulator'
+        repository: 'simulator'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        buildContext: 'axion-data-simulator'
+        Dockerfile: '$(Build.SourcesDirectory)/axion-data-simulator/Dockerfile'
+        buildContext: '$(Build.SourcesDirectory)/axion-data-simulator'
+        tags: |
+          $(IMAGE_TAG)
+
+
+    # =================================================
+    # UI
+    # =================================================
+
     - task: Docker@2
+      displayName: Build and Push UI
       inputs:
         containerRegistry: 'docker-rg'
-        repository: 'grugram.azurecr.io/axion-ui'
+        repository: 'axion-ui'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-        buildContext: 'axion-ui'
+        Dockerfile: '$(Build.SourcesDirectory)/axion-ui/Dockerfile'
+        buildContext: '$(Build.SourcesDirectory)/axion-ui'
+        tags: |
+          $(IMAGE_TAG)
+
+
+# =====================================================
+# STAGE 2 - DEPLOY TO AKS
+# =====================================================
+
+- stage: AKSDeploy
+  displayName: Deploy to AKS
+
+  dependsOn: DockerBuild
+  condition: succeeded()
+
+  jobs:
+  - job: Deploy
+    displayName: Deploy Applications to AKS
+
+    steps:
+
+    # =================================================
+    # INGESTION
+    # =================================================
+
+    - task: KubernetesManifest@1
+      displayName: Deploy Ingestion to AKS
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: 'axionaks'
+        manifests: |
+          $(Build.SourcesDirectory)/axion-ingestion-service/Manifests/deployment.yaml
+          $(Build.SourcesDirectory)/axion-ingestion-service/Manifests/service.yaml
+        containers: |
+          grugram.azurecr.io/ingestion:$(IMAGE_TAG)
+
+
+    # =================================================
+    # TELEMETRY
+    # =================================================
+
+    - task: KubernetesManifest@1
+      displayName: Deploy Telemetry to AKS
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: 'axionaks'
+        manifests: |
+          $(Build.SourcesDirectory)/axion-telemetry-query-service/Manifests/deployment.yaml
+          $(Build.SourcesDirectory)/axion-telemetry-query-service/Manifests/service.yaml
+        containers: |
+          grugram.azurecr.io/telemetry:$(IMAGE_TAG)
+
+
+    # =================================================
+    # SIMULATOR
+    # =================================================
+
+    - task: KubernetesManifest@1
+      displayName: Deploy Simulator to AKS
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: 'axionaks'
+        manifests: |
+          $(Build.SourcesDirectory)/axion-data-simulator/Manifests/deployment.yaml
+          $(Build.SourcesDirectory)/axion-data-simulator/Manifests/service.yaml
+        containers: |
+          grugram.azurecr.io/simulator:$(IMAGE_TAG)
+
+
+    # =================================================
+    # UI
+    # =================================================
+
+    - task: KubernetesManifest@1
+      displayName: Deploy UI to AKS
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: 'axionaks'
+        manifests: |
+          $(Build.SourcesDirectory)/axion-ui/Manifests/deployment.yaml
+          $(Build.SourcesDirectory)/axion-ui/Manifests/service.yaml
+        containers: |
+          grugram.azurecr.io/axion-ui:$(IMAGE_TAG)
