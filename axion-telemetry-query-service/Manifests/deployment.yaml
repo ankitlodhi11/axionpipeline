@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: axion-telemetrycontainer
-          image: grugram.azurecr.io/:latest
+          image: grugram.azurecr.io/telemetry:latest
           ports:
             - containerPort: 8000
           
