@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: axion-telemetry-service
 spec:
-  type: ClusterIP   # Agar direct UI pod/Ingress se connect ho raha hai
+  type: ClusterIP
   selector:
-    app: axion-telemetry   # Dhyaan dein: Ye label telemetry deployment ke template labels se match hona chahiye
+    app: axion-telemetry
   ports:
-    - protocol: TCP
-      port: 80
+    - name: http
+      port: 8000
       targetPort: 8000
