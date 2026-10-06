@@ -7,7 +7,7 @@ import { Throughput } from '../Throughput';
 import { DigitalTwin } from '../DigitalTwin';
 import { ThermalCamera } from '../ThermalCamera';
 
-const API_BASE = 'http://api.axionsystems.de';
+const API_BASE = 'http://aaoindiadekhe.online'; // Replace with your actual API base URL
 
 interface DashboardViewProps {
   devices: any[];

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: axion-telemetry 
+  name: axion-telemetry
 spec:
   replicas: 1
   selector:
@@ -10,11 +10,10 @@ spec:
   template:
     metadata:
       labels:
-        app: axion-telemetry 
+        app: axion-telemetry
     spec:
       containers:
         - name: axion-telemetrycontainer
-          image: grugram.azurecr.io/telemetry:latest
+          image: axiontest.azurecr.io/telemetry:v1
           ports:
             - containerPort: 8000
-          

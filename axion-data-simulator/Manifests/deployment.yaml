@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
         - name: simulatorcontainer
-          image: grugram.azurecr.io/simulator:latest
+          image: axiontest.azurecr.io/simulater:v1
           env:
             - name: API_URL
-              value: "http://azioningestion-service:8000/api/v1/telemetry/ingest"
+              value: "http://axioningestion-service:8000/api/v1/telemetry/ingest"
 
             - name: INTERVAL_SECONDS
               value: "5"  

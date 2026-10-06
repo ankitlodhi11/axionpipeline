@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: axion-ingress
+  annotations:
+    kubernetes.io/ingress.class: azure/application-gateway
+    # Health probe ko /healthz ya telemetry endpoint par point karein
+    appgw.ingress.kubernetes.io/health-probe-path: "/devices"
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399"
+spec:
+  ingressClassName: azure-application-gateway
+  rules:
+    - host: aaoindiadekhe.online
+      http:
+        paths:
+          - path: /dashboard/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: axion-telemetry-service
+                port:
+                  number: 8000
+          - path: /devices/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: axion-telemetry-service
+                port:
+                  number: 8000
+          - path: /devices
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: axion-telemetry-service
+                port:
+                  number: 8000
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: axion-ui-service
+                port:
+                  number: 80
